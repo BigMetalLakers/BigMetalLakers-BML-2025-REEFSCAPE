@@ -101,4 +101,20 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
+
+  public static final class ArmConstants {
+    // Lifter
+    public static final int kLifterPWMPort = 0; 
+    public static final int kLifterEncoderPortA = 0;
+    public static final int kLifterEncoderPortB = 1;
+
+    // Joint
+    public static final int kJointPWMPort = 0; 
+    public static final int kJointEncoderPortA = 2;
+    public static final int kJointEncoderPortB = 3;
+
+    // Intake
+    public static final int kCoralIntakePWMPort = 0; 
+    public static final int kAlgaeIntakePWMPort = 0; 
+  }
 }
