@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -53,4 +54,22 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+    private static RobotConfig retrieveConfig() {
+      RobotConfig rConfig;
+      try{
+        rConfig = RobotConfig.fromGUISettings();
+      } catch (Exception e) {
+        // Handle exception as needed
+        e.printStackTrace();
+        rConfig = new RobotConfig(0, 0, null, 0);
+      };
+      return rConfig;
+    }
+
+    public static final RobotConfig robotConfig = retrieveConfig();
+
+    // public static RobotConfig getConfig() {
+    //   return config;
+    // }
+  
 }

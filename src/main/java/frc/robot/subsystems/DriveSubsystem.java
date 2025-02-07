@@ -35,10 +35,11 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
+// import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Configs;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -101,15 +102,15 @@ public class DriveSubsystem extends SubsystemBase {
     // All other subsystem initialization
     // ...
 
-    // Load the RobotConfig from the GUI settings. You should probably
-    // store this in your Constants file
-    RobotConfig config;
-    try{
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-    }
+    // // Load the RobotConfig from the GUI settings. You should probably
+    // // store this in your Constants file
+    // RobotConfig config;
+    // try{
+    //   config = RobotConfig.fromGUISettings();
+    // } catch (Exception e) {
+    //   // Handle exception as needed
+    //   e.printStackTrace();
+    // }
     
     // Configure AutoBuilder last
     AutoBuilder.configure(
@@ -121,7 +122,8 @@ public class DriveSubsystem extends SubsystemBase {
             new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
             new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
     ),
-    config, // The robot configuration
+    Configs.robotConfig,
+    // config, // The robot configuration
     () -> {
       // Boolean supplier that controls when the path will be mirrored for the red alliance
       // This will flip the path being followed to the red side of the field.
