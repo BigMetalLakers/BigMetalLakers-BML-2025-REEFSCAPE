@@ -1,3 +1,25 @@
+# BLMSS 2025 REEFSCAPE Season
+
+## [V2.0] - 2025-02-08
+
+- Changed ArmSubsystem to CoralSubsystem
+- Created CoralSubsystem Constants
+- Added button examples for CoralSubsystem
+- Removal of PathWeaver folder
+
+## [V1.2] - 2025-02-06
+
+- Began addition of ArmSubsystem (joint + lifter)
+
+## [V1.1] - 2025-02-03
+
+- Continuation of PathPlanner implementation
+
+## [V1.0]
+
+- Began to add PathPlanner implementation with PathPlannerLib
+
+
 # MAXSwerve Java Template Changelog
 
 ## [2025.1] - 2025-01-04

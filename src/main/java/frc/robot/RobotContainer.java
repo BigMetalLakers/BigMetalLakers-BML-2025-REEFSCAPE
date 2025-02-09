@@ -1,6 +1,6 @@
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
+// Ramsete Controller imports
 // import edu.wpi.first.math.controller.PIDController;
 // import edu.wpi.first.math.controller.ProfiledPIDController;
 // import edu.wpi.first.math.geometry.Pose2d;
@@ -9,20 +9,24 @@ import edu.wpi.first.math.MathUtil;
 // import edu.wpi.first.math.trajectory.Trajectory;
 // import edu.wpi.first.math.trajectory.TrajectoryConfig;
 // import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+// import frc.robot.Constants.AutoConstants;
+// import frc.robot.Constants.DriveConstants;
+// import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+// import java.util.List;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj.Joystick;
-// import frc.robot.Constants.AutoConstants;
-// import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.CoralSubsystem.Setpoint;
+import frc.robot.subsystems.CoralSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-// import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-// import java.util.List;
+
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -40,17 +44,13 @@ public class RobotContainer {
 
   // The robot's subsystems
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final CoralSubsystem m_CoralSubsystem = new CoralSubsystem();
 
   // The driver's controller
-  Joystick m_driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-  
-  // Field Centric Boolean and Toggle
-  public Boolean fCentricBoolean = false;
-  private void toggleFieldCentric() {
-    fCentricBoolean = !(fCentricBoolean);
-    SmartDashboard.putBoolean("field Centric", fCentricBoolean);
-  }
+  CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  // Joystick m_driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
 //   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -68,16 +68,27 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
+
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverJoystick.getY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverJoystick.getX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverJoystick.getZ(), OIConstants.kDriveDeadband),
-                fCentricBoolean),
+                -MathUtil.applyDeadband(
+                  m_driverController.getLeftTriggerAxis() 
+                  - m_driverController.getRightTriggerAxis(), 
+                  OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                // -MathUtil.applyDeadband(m_driverJoystick.getY(), OIConstants.kDriveDeadband),
+                // -MathUtil.applyDeadband(m_driverJoystick.getX(), OIConstants.kDriveDeadband),
+                // -MathUtil.applyDeadband(m_driverJoystick.getZ(), OIConstants.kDriveDeadband),
+                m_robotDrive.fCentricBoolean),
             m_robotDrive));
+
+  m_CoralSubsystem.setDefaultCommand(
+    m_CoralSubsystem.rotate(0)
+  );
   }
 
   /**
@@ -88,18 +99,31 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
    * passing it to a
    * {@link JoystickButton}.
+   * 
+
+
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_driverJoystick, 3) // Assigns Joystick Button 3 to 'X' wheel formation
-    // Button.kR1.value
-        .whileTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    // m_driverController.a().whileTrue(m_robotDrive.setX());
 
-    new JoystickButton(m_driverJoystick, 11) // Assigns Joystick Button 12 to Toggling Field Centric Drive Mode
-        .whileTrue(new RunCommand(
-            () -> toggleFieldCentric()
-        ));
+    m_driverController.x().whileTrue(m_robotDrive.setX());
+
+    m_driverController.rightBumper().onTrue(m_robotDrive.alterFieldCentric(true));
+    m_driverController.leftBumper().onTrue(m_robotDrive.alterFieldCentric(false));
+
+    m_driverController.a().whileTrue(m_CoralSubsystem.setSetpointCommand(Setpoint.kLevel4));
+    m_driverController.y().whileTrue(m_CoralSubsystem.setSetpointCommand(Setpoint.kLevel1));
+
+    m_driverController.pov(0).whileTrue(m_CoralSubsystem.runIntakeCommand());
+    m_driverController.pov(180).whileTrue(m_CoralSubsystem.reverseIntakeCommand());
+    
+
+
+    // new JoystickButton(m_driverController, Button.kR1.value) // Assigns Joystick Button 3 to 'X' wheel formation
+    // // Button.kR1.value
+    //     .whileTrue(new RunCommand(
+    //         () -> m_robotDrive.setX(),
+    //         m_robotDrive));
 
   }
 

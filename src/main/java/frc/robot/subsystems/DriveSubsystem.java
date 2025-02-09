@@ -33,6 +33,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Configs;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -89,6 +90,9 @@ public class DriveSubsystem extends SubsystemBase {
         VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
         VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))
         );
+
+  public Boolean fCentricBoolean = false;
+
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -164,6 +168,7 @@ public class DriveSubsystem extends SubsystemBase {
       Pose2d robotPosition = new Pose2d(
         pvRobotPose.getTranslation().toTranslation2d(), 
         pvRobotPose.getRotation().toRotation2d());
+        
       m_field.setRobotPose(robotPosition);
        SmartDashboard.putData("pvrobotPose", m_field);
        resetPose(robotPosition);
@@ -254,12 +259,30 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Sets the wheels into an X formation to prevent movement.
    */
-  public void setX() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  // public void setX() {
+  //   m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  //   m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+  //   m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+  //   m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  // }
+
+  public Command setX() {
+    return this.run(
+      () -> {
+        m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+        m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+        m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+      });
+    }
+  
+  public Command alterFieldCentric(boolean state) {
+    return this.runOnce(
+      () -> fCentricBoolean = state
+    );
   }
+
+
 
   /**
    * Sets the swerve ModuleStates.
